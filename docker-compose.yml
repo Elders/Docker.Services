@@ -1,0 +1,51 @@
+version: "2.1"
+services:
+  cassandra-seed:
+    # docker network where all cassandra nodes will be put in
+    image: "cassandra:4.0"
+    ports:
+      - "9042:9042"
+    volumes:
+      - "cassandra-seed:/var/lib/cassandra" # This is the volume that will persist data for cassandra
+    environment:
+      - "MAX_HEAP_SIZE=1024M"
+      - "HEAP_NEWSIZE=100M"
+      - "CASSANDRA_CLUSTER_NAME=elders-local"
+      - "CASSANDRA_DC=elders-local-dc"
+      - "CASSANDRA_RACK=Rack1"
+      - "CASSANDRA_ENDPOINT_SNITCH=GossipingPropertyFileSnitch"
+    restart: always
+  rabbitmq:
+    image: "eldersoss/rabbitmq:3.9.11"
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    volumes:
+      - "rabbitmq-etc:/etc/rabbitmq/"
+      - "rabbitmq-data:/var/lib/rabbitmq/"
+      - "rabbitmq-logs:/var/log/rabbitmq/"
+    environment:
+      - "RABBITMQ_DEFAULT_PASS=pass"
+      - "RABBITMQ_DEFAULT_USER=user"
+      - "RABBITMQ_DEFAULT_VHOST=rabbit"
+    restart: "always"
+  consul:
+    image: "consul:1.11"
+    volumes:
+      - "consul:/consul/data"
+    ports:
+      - "8500:8500"
+      - "8400:8400"
+      - "8300:8300"
+      - "8301:8301"
+      - "8302:8302"
+      - "8300:8300/udp"
+      - "8600:8600/tcp"
+      - "8600:8600/udp"
+    restart: "always"
+volumes:
+  cassandra-seed:
+  rabbitmq-etc:
+  rabbitmq-data:
+  rabbitmq-logs:
+  consul:
